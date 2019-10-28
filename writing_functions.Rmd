@@ -200,3 +200,72 @@ sim_regression(n = 3000, beta0 = 1, beta1 = 3)
 sim_regression(3000)
 ```
 
+
+## Scrape lots of napolean
+
+```{r}
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-title") %>%
+  html_text()
+
+review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text()
+
+review_text = 
+  dynamite_html %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+Now as a function
+
+```{r}
+read_page_reviews = function(page_url) {
+ 
+  dynamite_html = read_html(page_url)
+
+  review_titles = 
+    dynamite_html %>%
+    html_nodes("#cm_cr-review_list .review-title") %>%
+    html_text()
+
+  review_stars = 
+    dynamite_html %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text()
+
+  review_text = 
+    dynamite_html %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+
+  reviews = tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+)
+  reviews
+}
+```
+
+```{r}
+read_page_reviews("https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1")
+
+read_page_reviews("https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=2")
+
+read_page_reviews("https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=3")
+```
+
