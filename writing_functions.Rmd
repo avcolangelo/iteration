@@ -76,11 +76,45 @@ z_score(x_arg = y)
 ```{r}
 mean_and_sd = function(input_x) {
   
-   if (!is.numeric(x_arg)) {
+   if (!is.numeric(input_x)) {
     stop("x should be numeric")
-  } else if (length(x_arg) < 3) {
+  } else if (length(input_x) < 3) {
     stop("x should be longer than 3")
   }
+
+tibble(
+  mean_input = mean(input_x),
+  sd_input = sd(input_x)  
+)
+
 }
 ```
 
+test this function
+```{r}
+mean_and_sd(input_x = y)
+```
+
+using list
+```{r}
+mean_and_sd = function(input_x) {
+  
+   if (!is.numeric(input_x)) {
+    stop("x should be numeric")
+  } else if (length(input_x) < 3) {
+    stop("x should be longer than 3")
+  }
+  
+  list(
+    mean_input = mean(input_x),
+    sd_input = sd(input_x),
+    z_score = (input_x - mean(input_x)) / sd(input_x)
+)
+}
+```
+
+```{r}
+mean_and_sd(input_x = y)
+```
+
+## Multiple inputs
