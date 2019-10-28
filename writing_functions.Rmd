@@ -3,11 +3,13 @@ title: "Writing Functions"
 author: "Alexis"
 date: "10/28/2019"
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(viridis)
+library(rvest)
 
 
 knitr::opts_chunk$set(
@@ -27,5 +29,58 @@ knitr::opts_chunk$set(
   scale_fill_discrete = scale_fill_viridis_d
   
   theme_set(theme_minimal() + theme(legend.position = "bottom"))
+```
+
+## Get started
+
+We're going to write some functions.
+
+Z-scores
+```{r}
+x = rnorm(n = 30, mean = 4, sd = 2.3)
+x_again = rnorm(n = 30, mean = 6, sd = .3)
+y = rnorm(n = 30, mean = 24, sd = 2.3)
+
+(x - mean(x)) / sd(x)
+(x_again - mean(x_again)) / sd(x_again)
+```
+
+Now a function
+
+```{r}
+z_score = function(x_arg) {
+  
+  if (!is.numeric(x_arg)) {
+    stop("x should be numeric")
+  } else if (length(x_arg) < 3) {
+    stop("x should be longer than 3")
+  }
+  
+  (x_arg - mean(x_arg)) / sd(x_arg)
+}
+```
+
+Try out the function.
+```{r}
+z_score(x_arg = y)
+
+#these should not work given the function:
+#z_score(x_arg = 3)
+#z_score(x_arg = "my name is jeff")
+#z_score(x_arg = c(TRUE, TRUE, FALSE, TRUE))
+#z_score(x_arg = iris)
+```
+
+## Multiple outputs
+
+```{r}
+mean_and_sd = function(input_x) {
+  
+   if (!is.numeric(x_arg)) {
+    stop("x should be numeric")
+  } else if (length(x_arg) < 3) {
+    stop("x should be longer than 3")
+  }
+}
 ```
 
