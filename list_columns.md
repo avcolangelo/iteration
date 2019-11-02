@@ -80,5 +80,108 @@ df[[2]]
     ## [16]  2.26866589 -1.16232074  4.35002762  8.28001867 -0.03184464
 
 ``` r
-#mean_and_sd(df[[1]])
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+```
+
+``` r
+mean_and_sd(df[[1]])
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  2.70  1.12
+
+``` r
+mean_and_sd(df[[2]])
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1 0.416  4.08
+
+``` r
+mean_and_sd(df[[3]])
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  10.1 0.191
+
+``` r
+mean_and_sd(df[[4]])
+```
+
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1 -3.43  1.18
+
+``` r
+output = vector("list", length = 4)
+```
+
+Writing first for loop
+
+``` r
+for (i in 1:4) {
+  
+  output[[i]] = mean_and_sd(df[[i]])
+}
+
+output
+```
+
+    ## [[1]]
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  2.70  1.12
+    ## 
+    ## [[2]]
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1 0.416  4.08
+    ## 
+    ## [[3]]
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1  10.1 0.191
+    ## 
+    ## [[4]]
+    ## # A tibble: 1 x 2
+    ##    mean    sd
+    ##   <dbl> <dbl>
+    ## 1 -3.43  1.18
+
+map statement
+
+``` r
+output = map(df, mean_and_sd)
+
+output_median = map(df, median)
+output_median = map_dbl(df, median)
+
+output_summary = map(df, summary)
+
+output = map_dfr(df, mean_and_sd)
 ```
