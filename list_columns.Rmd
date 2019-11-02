@@ -9,6 +9,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(rvest)
 set.seed(1)
 
 
@@ -110,7 +111,6 @@ output
 ```
 
 map statement
-
 ```{r}
 output = map(df, mean_and_sd)
 
@@ -120,5 +120,65 @@ output_median = map_dbl(df, median)
 output_summary = map(df, summary)
 
 output = map_dfr(df, mean_and_sd)
+
+#map everything in input list into mean and sd and that's where the argument should go:  not changing result just being more explicit on what's going on 
+output = map(df, ~mean_and_sd(.x))
 ```
+
+## Napolean
+```{r}
+read_page_reviews = function(url) {
+  
+  h = read_html(url)
+  
+  title = h %>%
+    html_nodes("#cm_cr-review_list .review-title") %>%
+    html_text()
+  
+  stars = h %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("\\d") %>%
+    as.numeric()
+  
+  text = h %>%
+    html_nodes(".review-data:nth-child(5)") %>%
+    html_text()
+  
+  data_frame(title, stars, text)
+}
+```
+
+```{r}
+url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+vec_urls = str_c(url_base, 1:5)
+
+vec_urls
+
+read_page_reviews(vec_urls[[1]])
+read_page_reviews(vec_urls[[2]])
+read_page_reviews(vec_urls[[3]])
+read_page_reviews(vec_urls[[4]])
+read_page_reviews(vec_urls[[5]])
+```
+
+```{r}
+output = vector("list", length = 5)
+
+for (i in 1:5) {
+  
+  output[[i]] = read_page_reviews(vec_urls[[i]])
+}
+
+#map statement does same thing as above
+output = map(vec_urls, read_page_reviews)
+```
+
+## List Columns
+
+
+
+
+
+
 
