@@ -1,0 +1,78 @@
+---
+title: "Iteration: Unsolved homicide rates"
+author: "Alexis"
+date: "10/28/2019"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  out.width = "90%"
+  )
+
+  options(
+    ggplot2.continuous.colour = "viridis",
+    ggplot2.continuous.fill = "viridis"
+  )
+  
+  scale_colour_discrete = scale_colour_viridis_d
+  scale_fill_discrete = scale_fill_viridis_d
+  
+  theme_set(theme_minimal() + theme(legend.position = "bottom"))
+  
+```
+
+## Read in dataset
+```{r}
+homicide_df = 
+  read_csv("data/homicide-data.csv", na = c("", "NA", "Unknown")) %>%
+  mutate(
+    city_state = str_c(city, state, sep = ", "),
+    resolution = case_when(
+      disposition == "Closed without arrest" ~ "unsolved",
+      disposition == "Open/No arrest"        ~ "unsolved",
+      disposition == "Closed by arrest"      ~ "solved"
+    )
+  ) %>% 
+  filter(city_state != "Tulsa, AL") 
+
+```
+
+## Aggregate at the city level
+```{r}
+city_homicide_df =
+  homicide_df %>%
+  select(city_state, resolution, disposition) %>%
+  group_by(city_state) %>%
+  summarize(
+    hom_unsolved = sum(resolution == "unsolved"),
+      hom_total = n()
+  )
+```
+
+## For one city ...
+
+... get the estimated rate of unsolved homicides and CI using prop.test() and broom::tidy()
+
+```{r}
+prop.test(x = 1825, n = 2827)
+```
+
+```{r}
+#prop.test(
+  #x = city_homicide_df %>% filter(city_state == "Baltimore, MD"), n = 2827
+
+```
+
+## Repeat for all cities
+
