@@ -54,7 +54,7 @@ city_homicide_df =
 and broom::tidy()
 
 ``` r
-prop.test(x = 1825, n = 2827)
+prop.test(x = 1825, n = 2827) 
 ```
 
     ## 
@@ -70,8 +70,46 @@ prop.test(x = 1825, n = 2827)
     ## 0.6455607
 
 ``` r
-#prop.test(
-  #x = city_homicide_df %>% filter(city_state == "Baltimore, MD"), n = 2827
+#64.5% of homicides in Baltimore are unsolved, 95% CI: 0.628-0.663 
 ```
 
+without inputting it from the table manually:
+
+``` r
+prop.test(
+  x = city_homicide_df %>% filter(city_state == "Baltimore, MD") %>% pull(hom_unsolved),
+  n = city_homicide_df %>% filter(city_state == "Baltimore, MD") %>% pull(hom_total)) %>%
+  broom::tidy()
+```
+
+    ## # A tibble: 1 x 8
+    ##   estimate statistic  p.value parameter conf.low conf.high method
+    ##      <dbl>     <dbl>    <dbl>     <int>    <dbl>     <dbl> <chr> 
+    ## 1    0.646      239. 6.46e-54         1    0.628     0.663 1-sam~
+    ## # ... with 1 more variable: alternative <chr>
+
 ## Repeat for all cities
+
+``` r
+homicide_results = 
+  city_homicide_df %>%
+  mutate(prop_test = 
+           map2(.x = hom_unsolved, .y = hom_total, ~prop.test(x = .x, n = .y)),
+         estimate_df = map(prop_test, broom::tidy)) %>%
+  select(city_state, estimate_df) %>%
+  unnest(estimate_df) %>%
+  select(city_state, estimate, conf.low, conf.high) %>%
+  mutate(city_state = fct_reorder(city_state, estimate)) #reorder the variable city_state according to estimated rate of unsolved homicides
+```
+
+## Visualize results
+
+``` r
+homicide_results %>%
+  ggplot(aes(x = city_state, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+<img src="iteration_homicide_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
