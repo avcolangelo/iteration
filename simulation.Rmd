@@ -1,0 +1,96 @@
+---
+title: "Simulations!"
+author: "Alexis"
+date: "10/28/2019"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  out.width = "90%"
+  )
+
+  options(
+    ggplot2.continuous.colour = "viridis",
+    ggplot2.continuous.fill = "viridis"
+  )
+  
+  scale_colour_discrete = scale_colour_viridis_d
+  scale_fill_discrete = scale_fill_viridis_d
+  
+  theme_set(theme_minimal() + theme(legend.position = "bottom"))
+  
+```
+
+## Time to simulate
+
+```{r}
+set.seed(1)
+```
+
+Re-use the function from a few lectures ago
+```{r}
+sim_regression = function(n, beta0 = 2, beta1 = 3) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+```
+
+```{r}
+sim_regression(n = 30)
+```
+
+## rerun using a for loop
+
+```{r}
+output = vector("list", length = 5000)
+
+for (i in 1:5000) {
+  output[[i]] = sim_regression(n = 30)
+}
+
+bind_rows(output)
+
+bind_rows(output) %>%
+  ggplot(aes(x = beta0_hat)) + geom_density()
+```
+
+
+## rerun simulation using `purrr`
+
+```{r}
+output = 
+  rerun(5000, sim_regression(n = 30)) %>%
+  bind_rows
+```
+
+```{r}
+output %>%
+  ggplot(aes(x = beta0_hat, y = beta1_hat)) + 
+  geom_point()
+```
+
+
+
+
+
+
